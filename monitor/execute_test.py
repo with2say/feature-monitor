@@ -1,17 +1,13 @@
 import paramiko
 import time
 
+global_output_buffer = []
 
 host = "172.28.201.169"  # 192.168.35.87
 port = 10001
 username = "root"
 password = "qwer1234"
-script = """
-    for i in {1..20}; do
-        uptime
-        sleep 0.2
-    done
-    """
+script = """for i in {1..20}; do uptime; sleep 0.2; done;"""
 
 
 def read_output(channel):
@@ -19,6 +15,7 @@ def read_output(channel):
         lines = buffer.split('\n')
         if len(lines) > 1:
             print(lines[:-1])
+            global_output_buffer.append(lines[:-1])
             return lines[-1]
         return buffer
 
@@ -55,3 +52,4 @@ def execute_ssh_command(host, port, username, password, command):
 if __name__ == "__main__":
     execute_ssh_command(host, port, username, password, script)
     # execute_ssh_command(host, port, username, password, 'uptime')
+    print(global_output_buffer)

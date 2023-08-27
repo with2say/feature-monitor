@@ -2,8 +2,10 @@
 
 from pydantic import BaseModel
 
+
 class NodeInfo(BaseModel):
     name: str
-    address: str
+    hostname: str
+    port: int
     username: str
     password: str

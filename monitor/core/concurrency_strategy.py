@@ -1,18 +1,24 @@
-# monitor/core/strategy.py
-
 from abc import ABC, abstractmethod
+import threading
 
 
 class Strategy(ABC):
     @abstractmethod
-    def execute(self, command):
+    def execute(self, nodes, target, args):
         pass
 
 
-class ThreadPoolStrategy(Strategy):
-    def execute(self, command):
-        # 스레드 풀을 사용하여 명령 실행
-        pass
+class OneThreadPerTaskStrategy(Strategy):
+
+    def execute(self, target, args_list):
+        threads = []
+        for args in args_list:
+            t = threading.Thread(target=target, args=args)
+            t.start()
+            threads.append(t)
+
+        for t in threads:
+            t.join()
 
 
 class EventLoopStrategy(Strategy):
