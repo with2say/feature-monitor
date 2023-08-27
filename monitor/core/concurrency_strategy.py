@@ -1,27 +1,34 @@
-from abc import ABC, abstractmethod
 import threading
 
+from monitor.core.connection_old import SSHConnectionManager
+from abc import ABC, abstractmethod
+from collections import defaultdict
+from concurrent.futures import ThreadPoolExecutor
+from monitor.models import NodeInfo
 
-class Strategy(ABC):
+
+class ConcurrencyManager(ABC):
     @abstractmethod
-    def execute(self, nodes, target, args):
+    def execute(self, func, *args, **kwargs):
         pass
 
 
-class OneThreadPerTaskStrategy(Strategy):
+class ThreadPoolConcurrency(ConcurrencyManager):
+    def __init__(self, max_workers=10):
+        self.executor = ThreadPoolExecutor(max_workers=max_workers)
 
-    def execute(self, target, args_list):
-        threads = []
-        for args in args_list:
-            t = threading.Thread(target=target, args=args)
-            t.start()
-            threads.append(t)
-
-        for t in threads:
-            t.join()
+    def execute(self, func, *args, **kwargs):
+        return self.executor.submit(func, *args, **kwargs)
 
 
-class EventLoopStrategy(Strategy):
-    def execute(self, command):
-        # 이벤트 루프를 사용하여 명령 실행
-        pass
+
+def one2one_thread(nodes, command, repeat=False):
+    threads = []
+    for node in nodes:
+        conn = SSHConnectionManager(**node.model_dump())
+        t = threading.Thread(target=conn.execute, args=[command, repeat])
+        t.start()
+        threads.append(t)
+
+    for t in threads:
+        t.join()
