@@ -28,6 +28,7 @@ def write(measurement_name: str,
 
     if verbose:
         print('writing...', point)
+
     try:
         write_api.write(bucket=bucket, org=org, record=point)
     except Exception as e:
@@ -52,7 +53,6 @@ def read(measurement_name: str,
 
 
 if __name__ == "__main__":
-
     read(measurement_name='node_monitoring')
 
     # write(

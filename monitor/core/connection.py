@@ -1,7 +1,7 @@
 import time
 import paramiko
 
-from monitor.settings import INFLUXDB_TOKEN, ORG, BUCKET, USERNAME, PRIVATE_KEY
+from monitor.settings import USERNAME, PRIVATE_KEY, SSH_STREAM_READ_INTERVAL, SSH_COMMAND_SEND_INTERVAL
 
 
 class SSHConnector:
@@ -18,7 +18,7 @@ class SSHConnector:
 
 
 class SSHExecutor:
-    def __init__(self, connector, command, repeat=False, interval=0.5):
+    def __init__(self, connector, command, repeat=False, interval=SSH_COMMAND_SEND_INTERVAL):
         self.connector = connector
         self.command = command
         self.repeat = repeat
@@ -44,8 +44,8 @@ class SSHOutputProcessor:
             if channel.exit_status_ready():
                 self._read_from_channel(channel, buffer, exit_ready=True)
                 break
-            time.sleep(1)
-        print(f"Exit status: {channel.recv_exit_status()}")
+            time.sleep(SSH_STREAM_READ_INTERVAL)
+        print(f"Exit {self.name} ({channel.recv_exit_status()})")
 
     def _read_from_channel(self, channel, buffer, exit_ready=False):
         if channel.recv_ready() or exit_ready:

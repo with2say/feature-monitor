@@ -1,4 +1,3 @@
-from collections import defaultdict
 
 
 class SingletonMeta(type):
@@ -14,20 +13,19 @@ class SingletonMeta(type):
 class ConnectionRegistry(metaclass=SingletonMeta):
     def __init__(self):
         self.connections = {}
-        self.execution_units = defaultdict(list)
 
     def add_connection(self, name, conn):
-        self.connections[name] = conn
-
-    def remove_connection(self, name):
         if name in self.connections:
-            self.connections[name].close()
+            self.connections[name].append(conn)
+        else:
+            self.connections[name] = [conn]
+        print(len(self.connections), self.connections)
+
+    def stop_connection(self, name):
+        print(self.connections)
+        if name in self.connections:
+            for conn in self.connections[name]:
+                conn.close()
             del self.connections[name]
-            print('exit {}'.format(name))
+            print('Stopping... {}'.format(name))
 
-    def add_execution_unit(self, name, unit):
-        self.execution_units[name].append(unit)
-
-    def clear_execution_units(self, name):
-        if name in self.execution_units:
-            del self.execution_units[name]

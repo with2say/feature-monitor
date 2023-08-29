@@ -1,5 +1,3 @@
-# monitor/main.py
-
 from fastapi import FastAPI
 from api.routers import router as api_router
 
