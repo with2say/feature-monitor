@@ -1,8 +1,7 @@
-import paramiko
 import time
+import paramiko
 
-USERNAME = 'root'
-PRIVATE_KEY = 'C:/Users/with2/PycharmProjects/feature-monitor/key/ansible'
+from monitor.settings import INFLUXDB_TOKEN, ORG, BUCKET, USERNAME, PRIVATE_KEY
 
 
 class SSHConnector:

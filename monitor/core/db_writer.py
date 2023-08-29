@@ -4,11 +4,7 @@ import influxdb_client
 from influxdb_client import InfluxDBClient, Point, WritePrecision
 from influxdb_client.client.write_api import SYNCHRONOUS
 
-
-INFLUXDB_TOKEN = "Hhw8zbuj0BukaLT-0lAVgB2gfKUdT0a_FDBWd7AXuZUJeFQE7lg1HMAnaOi4lLHzXyZBhlY3rVKWFKkh3fEoVA=="
-ORG = "a13"
-BUCKET = 'test'
-URL = "http://localhost:8086"
+from monitor.settings import INFLUXDB_TOKEN, ORG, BUCKET, URL
 
 client = influxdb_client.InfluxDBClient(url=URL, token=INFLUXDB_TOKEN, org=ORG)
 
