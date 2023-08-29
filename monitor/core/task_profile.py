@@ -32,10 +32,34 @@ class CPUTimeTaskProfile(TaskProfile):
     def flush_function(self, node_name, lines):
         for line in lines:
             field_value = float(self.extract_one_min_load_average(line))
-
             write(
                 measurement_name=MEASUREMENT_NODE,
                 tags={TAG_NODE_NAME: node_name},
                 fields={FILED_CPU_USAGE: field_value},
                 verbose=True,
             )
+
+
+class MemoryUsageTaskProfile(TaskProfile):
+    def __init__(self):
+        super().__init__('free', repeat=True)
+
+    @staticmethod
+    def extract_memory_info(line):
+        match = re.search(r'Mem:\s+(\d+)\s+(\d+)\s+(\d+)', line)
+        if match:
+            total, used, free = map(int, match.groups())
+            usage_percent = (used / total) * 100
+            return usage_percent
+        return None
+
+    def flush_function(self, node_name, lines):
+        for line in lines:
+            mem_info = self.extract_memory_info(line)
+            if mem_info is not None:
+                write(
+                    measurement_name=MEASUREMENT_NODE,
+                    tags={TAG_NODE_NAME: node_name},
+                    fields={'memory_usage': mem_info},
+                    verbose=True,
+                )

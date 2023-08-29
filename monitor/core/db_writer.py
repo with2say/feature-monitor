@@ -4,6 +4,7 @@ import influxdb_client
 from influxdb_client import InfluxDBClient, Point, WritePrecision
 from influxdb_client.client.write_api import SYNCHRONOUS
 
+
 INFLUXDB_TOKEN = "Hhw8zbuj0BukaLT-0lAVgB2gfKUdT0a_FDBWd7AXuZUJeFQE7lg1HMAnaOi4lLHzXyZBhlY3rVKWFKkh3fEoVA=="
 ORG = "a13"
 BUCKET = 'test'
@@ -19,6 +20,7 @@ def write(measurement_name: str,
           org: str = ORG,
           verbose: bool = False,
           ) -> None:
+
     write_api = client.write_api(write_options=SYNCHRONOUS)
     point = Point(measurement_name)
 
@@ -29,9 +31,11 @@ def write(measurement_name: str,
         point = point.field(field_key, field_value)
 
     if verbose:
-        print(point)
-
-    write_api.write(bucket=bucket, org=org, record=point)
+        print('writing...', point)
+    try:
+        write_api.write(bucket=bucket, org=org, record=point)
+    except Exception as e:
+        print(f"Failed to write to InfluxDB: {e}")
 
 
 def read(measurement_name: str,
@@ -52,5 +56,12 @@ def read(measurement_name: str,
 
 
 if __name__ == "__main__":
+
     read(measurement_name='node_monitoring')
 
+    # write(
+    #     measurement_name='node_monitoring',
+    #     tags={'name': 'node10'},
+    #     fields={'cpu_usage': 0.1},
+    #     verbose=True,
+    # )
