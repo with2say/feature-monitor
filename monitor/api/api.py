@@ -27,14 +27,9 @@ if __name__ == '__main__':
         NodeInfo(name='node01', hostname="172.28.201.169", port=10001),
         NodeInfo(name='node02', hostname="172.28.201.169", port=10002),
     ]
-
     add_node_api(nodes[0])
     add_node_api(nodes[1])
-    time.sleep(1)
-    delete_node_api('node01cpu')
-    time.sleep(1)
-    delete_node_api('node01')
-    time.sleep(1)
+    time.sleep(2)
     delete_node_api('node01')
     exit()
 
