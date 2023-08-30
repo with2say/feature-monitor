@@ -8,3 +8,7 @@ class NodeInfo(BaseModel):
     hostname: str
     port: int
 
+
+class NodeName(BaseModel):
+    name: str
+

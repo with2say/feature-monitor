@@ -16,6 +16,9 @@ class SSHConnector:
     def close(self):
         self.client.close()
 
+    def execute(self, command):
+        self.channel.exec_command(command)
+
 
 class SSHExecutor:
     def __init__(self, connector, command, repeat=False, interval=SSH_COMMAND_SEND_INTERVAL):

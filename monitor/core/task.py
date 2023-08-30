@@ -8,29 +8,23 @@ class NodeTask:
     def __init__(self, node: NodeInfo, task_profile: TaskProfile):
         self.node = node
         self.node_name = node.name
-        self.command = task_profile.command
-        self.repeat = task_profile.repeat
-        self.flush_function = task_profile.flush_function
+        self.task_profile = task_profile
         self.connector = None
 
     def run(self):
         # Connect
-        connector = SSHConnector(**self.node.model_dump())
-        self.connector = connector
-
-        # Execute
-        executor = SSHExecutor(connector, self.command, repeat=self.repeat)
-        executor.execute()
+        self.connector = SSHConnector(**self.node.model_dump())
+        self.connector.execute(self.task_profile.command)
 
         # Post-process
         processor = SSHOutputProcessor(
-            connector,
+            self.connector,
             self.node.name,
-            flush_output_callback=self.flush_function)
+            flush_output_callback=self.task_profile.flush_function)
         processor.read_output()
 
         # Close connection
-        connector.close()
+        self.connector.close()
 
     def close(self):
         self.connector.close()

@@ -1,4 +1,6 @@
 import re
+from typing import Optional
+
 from monitor.core.db_writer import write
 
 MEASUREMENT_NODE = 'node_monitoring'
@@ -9,18 +11,29 @@ FILED_CPU_USAGE = 'cpu_usage'
 FILED_MEMORY_USAGE = 'memory_usage'
 
 
-class TaskProfile:
-    def __init__(self, command, repeat=False):
-        self.command = command
-        self.repeat = repeat
+def build_loop_command(command: str, repeat: Optional[int], interval: float) -> str:
+    if repeat != 1:
+        if repeat is None:  # 무한 반복
+            loop_command = f'while true; do {command}; sleep {interval}; done'
+        else:  # 정해진 횟수만큼 반복
+            loop_command = f'for i in $(seq 1 {repeat}); do {command}; sleep {interval}; done'
 
-    def flush_function(self, node_name, command):
+        return f'/bin/bash -c "{loop_command}"'
+    else:
+        return command
+
+
+class TaskProfile:
+    def __init__(self, command: str, repeat: Optional[int] = 1, interval: float = 0.5):
+        self.command = build_loop_command(command, repeat, interval)
+
+    def flush_function(self, node_name: str, command: str) -> None:
         print(node_name, command)
 
 
 class CPUTimeTaskProfile(TaskProfile):
     def __init__(self):
-        super().__init__('uptime', repeat=True)
+        super().__init__('uptime', repeat=None)
 
     @staticmethod
     def extract_one_min_load_average(line):
@@ -42,7 +55,7 @@ class CPUTimeTaskProfile(TaskProfile):
 
 class MemoryUsageTaskProfile(TaskProfile):
     def __init__(self):
-        super().__init__('free', repeat=True)
+        super().__init__('free', repeat=None)
 
     @staticmethod
     def extract_memory_info(line):
